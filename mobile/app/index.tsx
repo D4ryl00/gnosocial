@@ -11,6 +11,7 @@ import { loggedIn, useAppDispatch } from "@gno/redux";
 import { KeyInfo } from "@buf/gnolang_gnonative.bufbuild_es/gnonativetypes_pb";
 import { useGnoNativeContext } from "@gnolang/gnonative";
 import Spacer from "@gno/components/spacer";
+import usePush from "@gno/hooks/use-push";
 
 export default function Root() {
   const route = useRouter();
@@ -22,6 +23,7 @@ export default function Root() {
   const gno = useGnoNativeContext();
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const { getPush } = usePush();
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
@@ -41,7 +43,8 @@ export default function Root() {
 
   const logIn = async (keyInfo: KeyInfo) => {
     const bech32 = await gno.addressToBech32(keyInfo.address);
-    await dispatch(loggedIn({ keyInfo, bech32 }));
+    const pushAPI = await getPush();
+    await dispatch(loggedIn({ keyInfo, bech32, pushAPI }));
     setTimeout(() => route.replace("/home"), 500);
   };
 

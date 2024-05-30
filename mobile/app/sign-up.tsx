@@ -1,15 +1,16 @@
-import { StyleSheet, Text, View, Button as RNButton, ScrollView, TextInput as RNTextInput } from "react-native";
+import { Button as RNButton, ScrollView, StyleSheet, Text, TextInput as RNTextInput, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { router, useNavigation } from "expo-router";
 import TextInput from "components/textinput";
 import Button from "components/button";
 import Spacer from "components/spacer";
 import * as Clipboard from "expo-clipboard";
-import { useAppDispatch, loggedIn } from "@gno/redux";
+import { loggedIn, useAppDispatch } from "@gno/redux";
 import Alert from "@gno/components/alert";
 import useOnboarding from "@gno/hooks/use-onboarding";
 import Layout from "@gno/components/layout";
 import { useGnoNativeContext } from "@gnolang/gnonative";
+import usePush from "@gno/hooks/use-push";
 
 export default function Page() {
   const [name, setName] = useState("");
@@ -24,6 +25,7 @@ export default function Page() {
   const gno = useGnoNativeContext();
   const dispatch = useAppDispatch();
   const onboarding = useOnboarding();
+  const { getPush } = usePush();
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
@@ -71,7 +73,8 @@ export default function Page() {
       await gno.setPassword(password);
       await onboarding.onboard(newAccount.name, newAccount.address);
       const bech32 = await gno.addressToBech32(newAccount.address);
-      await dispatch(loggedIn({ keyInfo: newAccount, bech32 }));
+      const pushAPI = await getPush();
+      await dispatch(loggedIn({ keyInfo: newAccount, bech32, pushAPI }));
       router.push("/home");
     } catch (error) {
       setError("" + error);

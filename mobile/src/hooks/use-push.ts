@@ -9,40 +9,36 @@ const usePush = () => {
   let address: string;
   let pushAPI: PushAPI;
 
-  const createWallet = async () => {
+  const createWallet = async (): Promise<ethers.Wallet> => {
     console.log("createWallet");
-    try {
-      // Creating a random signer from a wallet
-      wallet = ethers.Wallet.createRandom();
-      console.log("Wallet created with address: ", wallet.address);
+    // Creating a random signer from a wallet
+    const wallet = ethers.Wallet.createRandom();
+    console.log("Wallet created with address: ", wallet.address);
 
-      // store the private key and the address
-      await SecureStore.setItemAsync(PUSH_PRIVATE_KEY, wallet.privateKey);
-      console.log("Private key stored");
-    } catch (error: unknown | Error) {
-      console.log(error);
-    }
+    // store the private key and the address
+    await SecureStore.setItemAsync(PUSH_PRIVATE_KEY, wallet.privateKey);
+    console.log("Private key stored");
+
+    return wallet;
   };
 
   const initWallet = async () => {
     console.log("initWallet");
-    try {
-      const privateKey = await SecureStore.getItemAsync(PUSH_PRIVATE_KEY);
+    const privateKey = await SecureStore.getItemAsync(PUSH_PRIVATE_KEY);
 
-      if (!privateKey) {
-        await createWallet();
-      } else {
-        wallet = new ethers.Wallet(privateKey);
-      }
-      address = `eip155:${wallet.address}`;
-      console.log("Wallet initialized with address: ", address);
-    } catch (error: unknown | Error) {
-      console.log(error);
+    if (!privateKey) {
+      wallet = await createWallet();
+    } else {
+      wallet = new ethers.Wallet(privateKey);
     }
+    address = `eip155:${wallet.address}`;
+    console.log("Wallet initialized with address: ", address);
   };
 
   const getPush = async (): Promise<PushAPI> => {
+    console.log("getPush: called");
     if (!wallet) {
+      console.log("getPush: initWallet");
       await initWallet();
     }
     if (!pushAPI) {
