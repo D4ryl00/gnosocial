@@ -1,3 +1,5 @@
+import { PushAPI } from "@pushprotocol/react-native-sdk";
+
 export type Post = {
   user: {
     name: string;
@@ -18,6 +20,7 @@ export type Post = {
 export interface User {
   address: string;
   name: string;
+  pushAPI: PushAPI;
 }
 
 export interface Following {
@@ -29,7 +32,6 @@ export interface Following {
 export interface GetJsonFollowersResult {
   followers: Following[];
   n_followers: number;
-
 }
 export interface GetJsonFollowingResult {
   following: Following[];

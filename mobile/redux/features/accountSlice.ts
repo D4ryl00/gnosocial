@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { User } from "@gno/types";
 import { KeyInfo } from "@buf/gnolang_gnonative.bufbuild_es/gnonativetypes_pb";
 import { useGnoNativeContext } from "@gnolang/gnonative";
+import usePush from "@gno/hooks/use-push";
 
 export interface CounterState {
   account?: User;
@@ -13,8 +14,14 @@ const initialState: CounterState = {
 
 export const loggedIn = createAsyncThunk("user/loggedIn", async (param: { keyInfo: KeyInfo; bech32: string }, _) => {
   const { keyInfo, bech32 } = param;
+  const { getPush } = usePush();
 
-  const user: User = { address: bech32, name: keyInfo.name };
+  console.log("loggedIn", keyInfo, bech32);
+  const user: User = {
+    address: bech32,
+    name: keyInfo.name,
+    pushAPI: await getPush(),
+  };
 
   return user;
 });

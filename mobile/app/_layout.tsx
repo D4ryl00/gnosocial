@@ -12,6 +12,7 @@ import { store } from "@gno/redux";
 import { Guard } from "@gno/components/auth/guard";
 import { GnoNativeProvider } from "@gnolang/gnonative";
 import { IndexerProvider } from "@gno/provider/indexer-provider";
+import WebViewCrypto from "react-native-webview-crypto";
 
 const gnoDefaultConfig = {
   remote: process.env.EXPO_PUBLIC_GNO_REMOTE!,
@@ -24,22 +25,25 @@ const indexerDefaultConfig = {
 
 export default function AppLayout() {
   return (
-    <GnoNativeProvider config={gnoDefaultConfig}>
-      <IndexerProvider config={indexerDefaultConfig}>
-        <Provider store={store}>
-          <ThemeProvider value={DefaultTheme}>
-            <Guard>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  headerLargeTitle: true,
-                  headerBackVisible: false,
-                }}
-              />
-            </Guard>
-          </ThemeProvider>
-        </Provider>
-      </IndexerProvider>
-    </GnoNativeProvider>
+    <>
+      <WebViewCrypto />
+      <GnoNativeProvider config={gnoDefaultConfig}>
+        <IndexerProvider config={indexerDefaultConfig}>
+          <Provider store={store}>
+            <ThemeProvider value={DefaultTheme}>
+              <Guard>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    headerLargeTitle: true,
+                    headerBackVisible: false,
+                  }}
+                />
+              </Guard>
+            </ThemeProvider>
+          </Provider>
+        </IndexerProvider>
+      </GnoNativeProvider>
+    </>
   );
 }

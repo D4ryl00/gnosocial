@@ -39,6 +39,12 @@ export default function Root() {
     return unsubscribe;
   }, [navigation]);
 
+  const logIn = async (keyInfo: KeyInfo) => {
+    const bech32 = await gno.addressToBech32(keyInfo.address);
+    await dispatch(loggedIn({ keyInfo, bech32 }));
+    setTimeout(() => route.replace("/home"), 500);
+  };
+
   const onChangeAccountHandler = async (keyInfo: KeyInfo) => {
     try {
       setLoading("Changing account...");
@@ -51,9 +57,7 @@ export default function Root() {
         return;
       }
 
-      const bech32 = await gno.addressToBech32(keyInfo.address);
-      await dispatch(loggedIn({ keyInfo, bech32 }));
-      setTimeout(() => route.replace("/home"), 500);
+      await logIn(keyInfo);
     } catch (error: unknown | Error) {
       setLoading(error?.toString());
       console.log(error);
@@ -62,9 +66,7 @@ export default function Root() {
 
   const onCloseReenterPassword = async (sucess: boolean) => {
     if (sucess && reenterPassword) {
-      const bech32 = await gno.addressToBech32(reenterPassword.address);
-      await dispatch(loggedIn({ keyInfo: reenterPassword, bech32 }));
-      setTimeout(() => route.replace("/home"), 500);
+      await logIn(reenterPassword);
     }
     setReenterPassword(undefined);
   };
